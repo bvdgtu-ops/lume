@@ -1,0 +1,94 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+    <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
+    <UseRidGraph>true</UseRidGraph>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <RootNamespace>VividDesk</RootNamespace>
+    <AssemblyName>Lume</AssemblyName>
+    <ApplicationIcon>Lume.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <!-- PerMonitorV2: физические координаты мониторов при разных DPI -->
+    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+    <!-- короткие пути вывода: Release\ вместо bin\Release\net8.0-windows\ -->
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <OutputPath>$(Configuration)\</OutputPath>
+    <Version>1.0.0</Version>
+    <DebugType>none</DebugType>
+    <AllowedReferenceRelatedFileExtensions></AllowedReferenceRelatedFileExtensions>
+    <!-- один exe в корне установки: .NET и managed-зависимости внутри,
+         наружу выносится только resourses\ (libvlc и прочие крупные данные) -->
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>true</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- WPF и WinForms вместе дают конфликтующие global using — оставляем только WPF -->
+    <Using Remove="System.Windows.Forms" />
+    <Using Remove="System.Drawing" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- иконки доступны и как Win32 (ApplicationIcon), и как WPF-ресурс (pack-URI для трея) -->
+    <Resource Include="Lume.ico"/>
+    <Resource Include="LumeTray.ico"/>
+    <!-- шрифт интерфейса (Inter, SIL OFL): встроен в exe, установки не требует.
+         Замена на другой: положить TTF в Fonts\ и поменять имя семейства в App.xaml (AppFont) -->
+    <Resource Include="Fonts\*.ttf"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Видео-движок: LibVLC (LGPL-2.1) -->
+    <PackageReference Include="LibVLCSharp.WPF" Version="3.9.1" />
+    <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.21" />
+    <!-- Веб-обои: WebView2 (бесплатно, входит в Windows 10/11) -->
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2739.15" />
+    <!-- Захват системного звука для аудио-визуализатора (MIT) -->
+    <PackageReference Include="NAudio" Version="2.2.1" />
+    <!-- Windows TFM тянет WinUI-проекции WebView2, они конфликтуют с Microsoft.Web.WebView2; WinUI не используем -->
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.5.240627000" ExcludeAssets="all" PrivateAssets="all" />
+  </ItemGroup>
+
+  <!-- libvlc живёт ВНЕ single-file exe: копируется в resourses\libvlc\win-x64,
+       оттуда его грузит LibVLCSharp (см. App.InitVlcCore) -->
+  <PropertyGroup>
+    <VlcPkgRoot>$(NuGetPackageRoot)videolan.libvlc.windows\3.0.21\build\x64\</VlcPkgRoot>
+    <VlcWindowsX64Enabled>false</VlcWindowsX64Enabled>
+    <VlcWindowsX86Enabled>false</VlcWindowsX86Enabled>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="$(VlcPkgRoot)libvlc.dll;$(VlcPkgRoot)libvlccore.dll">
+      <Link>resourses\libvlc\win-x64\%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
+    <Content Include="$(VlcPkgRoot)plugins\**\*">
+      <Link>resourses\libvlc\win-x64\plugins\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
+    <Content Include="$(VlcPkgRoot)lua\**\*">
+      <Link>resourses\libvlc\win-x64\lua\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
+    <Content Include="$(VlcPkgRoot)hrtfs\**\*">
+      <Link>resourses\libvlc\win-x64\hrtfs\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
+  </ItemGroup>
+
+</Project>

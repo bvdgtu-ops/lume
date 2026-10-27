@@ -1,0 +1,24 @@
+﻿<Window x:Class="VividDesk.Wallpaper.WallpaperWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Lume Wallpaper"
+        WindowStyle="None" ResizeMode="NoResize" ShowInTaskbar="False"
+        ShowActivated="False" Focusable="False" IsHitTestVisible="False"
+        WindowStartupLocation="Manual" Background="Black"
+        Width="640" Height="360">
+    <Grid>
+        <!-- Веб-обои: WebView2 (WinForms) внутри WindowsFormsHost -->
+        <TextBlock x:Name="MessageText" Visibility="Collapsed" HorizontalAlignment="Center" VerticalAlignment="Center"
+                   TextWrapping="Wrap" TextAlignment="Center" FontSize="20" Foreground="#CCFFFFFF" Margin="40"/>
+        <WindowsFormsHost x:Name="WebHost" Visibility="Collapsed"/>
+        <!-- Видео-обои: простая WinForms-панель; HWND панели отдаётся libvlc явно
+             (VideoView внутри окна, прикреплённого к WorkerW, не находит свой HWND
+             и libvlc создаёт отдельное окно поверх рабочего стола).
+             ВАЖНО: два хоста в XAML — проверенная годная схема. WindowsFormsHost
+             нестабилен при повторных Child-свайпах в перепривязанном к WorkerW
+             окне (деградация контента и "Hosted HWND must be a child window..."),
+             поэтому каждый тип контента живёт в своём хосте, Child в нём
+             устанавливается и не переустанавливается лишний раз -->
+        <WindowsFormsHost x:Name="VideoHost" Visibility="Collapsed"/>
+    </Grid>
+</Window>

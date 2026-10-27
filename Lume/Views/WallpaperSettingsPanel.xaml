@@ -1,0 +1,11 @@
+<UserControl x:Class="VividDesk.Views.WallpaperSettingsPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid>
+        <TextBlock x:Name="EmptyText" TextWrapping="Wrap" Opacity="0.55" Margin="14,12,14,8"
+                   Text="Выберите обои в библиотеке."/>
+        <ScrollViewer x:Name="Scroller" VerticalScrollBarVisibility="Auto" Visibility="Collapsed">
+            <StackPanel x:Name="Root" Margin="14,12,14,20"/>
+        </ScrollViewer>
+    </Grid>
+</UserControl>
